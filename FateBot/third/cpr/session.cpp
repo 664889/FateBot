@@ -137,7 +137,7 @@ void Session::prepareCommon() {
     }
 
 #if LIBCURL_VERSION_MAJOR >= 7
-#if LIBCURL_VERSION_MINOR >= 21
+#if LIBCURL_VERSION_MAJOR >= 8 || LIBCURL_VERSION_MINOR >= 21
     if (acceptEncoding_.empty()) {
         /* enable all supported built-in compressions */
         curl_easy_setopt(curl_->handle, CURLOPT_ACCEPT_ENCODING, "");
@@ -148,7 +148,7 @@ void Session::prepareCommon() {
 #endif
 
 #if LIBCURL_VERSION_MAJOR >= 7
-#if LIBCURL_VERSION_MINOR >= 71
+#if  LIBCURL_VERSION_MAJOR >= 8 || LIBCURL_VERSION_MINOR >= 71
     // Fix loading certs from Windows cert store when using OpenSSL:
     curl_easy_setopt(curl_->handle, CURLOPT_SSL_OPTIONS, CURLSSLOPT_NATIVE_CA);
 #endif

@@ -19,6 +19,7 @@
 #include "utils/logger.hh"
 #include "utils/msgpack11.hh"
 #include "utils/my_exception.hh"
+#include "utils/rsa.hh"
 
 using std::string;
 using std::to_string;
@@ -52,7 +53,9 @@ Document User::TopLogin() {
     succ("[TopLogin] [%s]", name_);
     int last_access_time = std::stoi(builder_.AcquireParameter("lastAccessTime"));
     int user_state = (-last_access_time >> 2) ^ (uid_ & BaseHttp::data_server_folder_crc_);
+    std::string idempotencyKeySignature = Utility::sign(std::to_string(uid_) + builder_.AcquireParameter("idempotencyKey"));
 
+    builder_.AddParameter("idempotencyKeySignature", idempotencyKeySignature);
     builder_.AddParameter("assetbundleFolder", BaseHttp::asset_bundle_folder_);
     builder_.AddParameter("isTerminalLogin", "1");
     builder_.AddParameter("userState", user_state);
