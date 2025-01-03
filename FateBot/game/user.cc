@@ -232,7 +232,7 @@ void User::MissionComplete(const rapidjson::GenericValue<rapidjson::UTF8<>>& inp
                 }
             }
 
-            sleepsec(3);
+            sleepsec(1);
         }
     }
 }
@@ -272,14 +272,23 @@ std::vector<std::tuple<int, int64_t>> User::RecvPresents(const vector<int64_t>& 
         }
 
         auto userSvt = RecvPresents(subSpan);
-        for (auto& item : userSvt["cache"]["updated"]["userSvt"].GetArray()) {
-            int svtId = item["svtId"].GetInt();
-            int64_t id = item["id"].GetInt64();
-            received_presents.emplace_back(svtId, id);
+        if (userSvt.HasMember("cache") && userSvt["cache"].HasMember("updated") && userSvt["cache"]["updated"].HasMember("userSvt")) {
+            for (auto& item : userSvt["cache"]["updated"]["userSvt"].GetArray()) {
+                if (item.HasMember("svtId") && item["svtId"].IsInt() && item.HasMember("id") && item["id"].IsInt64()) {
+                    int svtId = item["svtId"].GetInt();
+                    int64_t id = item["id"].GetInt64();
+                    received_presents.emplace_back(svtId, id);
+                } else {
+                    warn("Error: Invalid JSON structure for 'userSvt' entry!");
+                }
+            }
+        } else {
+            warn("Error: Invalid JSON structure for 'userSvt'!");
         }
     }
     return received_presents;
 }
+
 
 Document User::RecvPresents(const vector<int64_t>& present_list, int item_select_index) {
     succ("[RecvPresents] [%s]", name_);
@@ -315,7 +324,7 @@ Document User::PostRequest(const Url& url) {
             info("[%s] %s\n%s", name_, url.c_str(), rsp.error.message);
         }
 
-        sleepsec(3);
+        sleepsec(1);
 
         session_->SetOption(body);
         rsp = session_->Post();
@@ -390,18 +399,18 @@ void User::CheckShopThread() {
 
                 user.TopHome();
 
-                sleepsec(3);
+                sleepsec(1);
 
                 for (auto& item : shop_ticket) {
                     try {
                         user.BuyItem(item.first, item.second);
-                        sleepsec(3);
+                        sleepsec(1);
                     } catch (MyException& ex) {
                         error("[CheckShop] [%s] id: %d - %d %s", user.name_, item.first, item.second, ex.what());
                     }
                 }
             });
-        sleepsec(3);
+        sleepsec(1);
     }
     for (auto& handle : GameBattle::battle_pool_) {
         if (handle.joinable()) {

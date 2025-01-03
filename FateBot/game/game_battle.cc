@@ -333,7 +333,7 @@ void GameBattle::BattleStart() {
         bool has_target_follower = false;
         for (size_t i = 0; i < 10; ++i) {
             if (i) {
-                sleepsec(3);
+                sleepsec(1);
             }
             auto follower = FollowerList();
             const auto& followerInfo = follower["cache"]["updated"]["userFollower"][0]["followerInfo"].GetArray();
@@ -391,11 +391,11 @@ void GameBattle::BattleStart() {
         FollowerList();
     }
 CONTINUE:
-    sleepsec(3);
+    sleepsec(1);
     BattleSetup();
-    sleepsec(30);
+    sleepsec(10);
     BattleResult();
-    sleepsec(3);
+    sleepsec(1);
 }
 
 void GameBattle::StartThread(int times, int index) {
@@ -436,7 +436,7 @@ void GameBattle::StartThread(int times, int index) {
                         }
                         user.TopHome();
 
-                        sleepsec(5);
+                        sleepsec(1);
 
                         for (int j = 0; j < times; ++j) {
                             if (is_exit_) {
@@ -446,7 +446,7 @@ void GameBattle::StartThread(int times, int index) {
                                 if (user.recover_count_ < UserManager::recover_limit_) {
                                     user_battle.APRecovery(); // Does this need try-catch?
                                     user.recover_count_++;
-                                    sleepsec(3);
+                                    sleepsec(1);
                                 }
                                 else {
                                     error("[StartThread] [%s] AP Not Enough", user.name_);
@@ -463,7 +463,7 @@ void GameBattle::StartThread(int times, int index) {
                         error("Exception: [%s] %s", user.name_, ex.what());
                     }
                 });
-            sleepsec(3);
+            sleepsec(1);
         }
     }
     for (auto& handle : GameBattle::battle_pool_) {
